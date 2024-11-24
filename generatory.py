@@ -42,6 +42,15 @@ def rc4_32(K, L, r):
     return Y
 
 
+# Blum Blum Shub
+def bbs(p, q, x, ln):
+    # assert is_prime(p) and is_prime(q)
+    assert x % p != 0 and x % q != 0 and p % 4 == 3 and q % 4 == 3
+    m = p*q
+    nums = [(x := x**2 % m) / m for _ in range(ln)]
+    return nums
+
+
 if __name__ == "__main__":
     print("lcg, dane: 13, 1, 5: ", lcg(13, 10, 13, 1, 5))
     print("lcg, dane: 2**10, 3, 7: ", lcg(13, 10, 2**10, 3, 7))
@@ -51,3 +60,4 @@ if __name__ == "__main__":
     L = 5
     K = [randint(0, 31) for _ in range(L)]
     print(rc4_32(K, L, 25))
+    print(bbs(7883, 15331, 683498, 10))
