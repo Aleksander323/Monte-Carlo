@@ -43,8 +43,6 @@ def scd_level(test, R, nums, *args, **kwargs):
 
 if __name__ == "__main__":
     # seed(10)
-    a = 3
-    b = 200
     L = 13
     K = [randint(0, 31) for _ in range(L)]
     print("bbs final p_value:", scd_level(test_chi2, 1000, bbs(125223563, 25223743, 6834782, 10**7), 100)[1])
