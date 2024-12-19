@@ -30,7 +30,7 @@ def glcg(x_vec, ln, m, a_vec, scaling=True):
     return nums
 
 
-def rc4_32(K, L, r, m=32, i_arg=0, j_arg=0, S_arg=None, get_S=False, scdlevel=False):
+def rc4_32(K, L, r, m, i_arg=0, j_arg=0, S_arg=None, get_S=False, scdlevel=False):
     assert m >= L > 0 and type(L) == int
     assert len(K) == L
     assert r > 0 and type(r) == int
