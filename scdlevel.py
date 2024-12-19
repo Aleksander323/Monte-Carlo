@@ -5,8 +5,8 @@ from time import time
 # start = time()
 
 # Testowanie LCG
-lcg_test1 = scd_level_lcg(test_chi2, 100, 20)
-lcg_test2 = scd_level_lcg(gap_test, 100, 0.2, 0.4, 0.05)
+lcg_test1 = scd_level_lcg(test_chi2, 1000, 20)
+lcg_test2 = scd_level_lcg(gap_test, 1000, 0.2, 0.4, 0.05)
 lcg_test3 = scd_level_lcg(kstest, 1000, 'uniform')
 
 # Testowanie GLCG
