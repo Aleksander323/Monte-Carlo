@@ -1,10 +1,8 @@
 from testy import *
-from scipy.stats import chisquare, norm, kstest
+from scipy.stats import kstest
 from random import randint, seed
 from time import time
-from read import digits_pi, digits_e, digits_sqrt2
 
-seed(1234)
 start = time()
 
 # Generowanie liczb, rozmiar = 2**20
@@ -13,7 +11,6 @@ lcg_nums = lcg(1652, 2 ** 20, 2 ** 42, 16801, 126581)
 sp1 = time()
 
 st2 = time()
-k = 5
 x_vec = [randint(1, 1200) for _ in range(k)]
 a_vec = [randint(1, 1200) for _ in range(k)]
 glcg_nums = glcg(x_vec, 2**20, 2**42, a_vec)
@@ -24,8 +21,9 @@ bbs_nums = bbs(125223563, 25223743, 6834782, 2**20)
 sp3 = time()
 
 st4 = time()
-L = 13
+L = 40
 m = 32
+seed(1234)
 K = [randint(0, m-1) for _ in range(L)]
 rc4_nums = rc4(K, L, 2**20, 32)
 sp4 = time()
@@ -80,6 +78,13 @@ rc4_test2 = frequency_of_pairs_test(rc4_nums, 32)
 # poker test
 rc4_test3 = poker_test(rc4_nums, 32)
 
+
+# Testowanie liczb e, pi, sqrt(2)
+
+e_test = frequency_monobit_test(digits_e[0:1000])
+pi_test = frequency_monobit_test(digits_pi[0:1000])
+sqrt2_test = frequency_monobit_test(digits_sqrt2[0:1000])
+
 end2 = time()
 
 # Wyniki
@@ -102,6 +107,11 @@ print("Wyniki testowania rc4:")
 print("test chi2 dyskretny:", rc4_test1)
 print("frequency of pairs test:", rc4_test2)
 print("poker test:", rc4_test3)
+print("..............")
+print("Wyniki testowania liczb e, pi, sqrt(2):")
+print("p-wartość dla e:", e_test)
+print("p-wartość dla pi:", pi_test)
+print("p-wartość dla sqrt(2):", sqrt2_test)
 print("..............")
 print("Czas wykonania:", end-start, end2-start2)
 print("czasy generowania: lcg:", sp1-st1, "glcg:", sp2-st2, "bbs:", sp3-st3, "rc4:", sp4-st4)
