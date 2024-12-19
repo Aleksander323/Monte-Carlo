@@ -3,6 +3,7 @@ from scipy.stats import chisquare, norm
 from random import randint, seed
 from generatory import *
 from collections import Counter
+from read import digits_pi, digits_e, digits_sqrt2
 
 
 def test_chi2(nums, k):
