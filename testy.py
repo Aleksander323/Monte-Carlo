@@ -105,18 +105,81 @@ def frequency_monobit_test(bits):
     return pv
 
 
-def scd_level(test, R, nums, *args, **kwargs):
-    n = len(nums)
-    pv_freq = [0] * 10
-    j = 0
-    size = int(n/R)
-    
-    for _ in range(R):
-        segment = nums[j:j+size]
-        _, pv = test(segment, *args, **kwargs)
-        pv_freq[int(pv * 10)] += 1
-        j += size
+def scd_level_bits(digits, R):
+    pv_freq = [0]*10
+    x = 0
 
+    for _ in range(R):
+        bitsy = digits[x:(1000+x)]
+        pv = frequency_monobit_test(bitsy)
+        if pv == 1:
+            pv_freq[-1] += 1
+        else:
+            pv_freq[int(10*pv)] += 1
+        x += 1000
+    print("Rozkład p-wartości:", pv_freq)
+
+    return chisquare(pv_freq)
+
+
+def scd_level_lcg(test, R, *args, **kwargs):
+    pv_freq = [0]*10
+    seed = 1652
+    for _ in range(R):
+        nums = lcg(seed, 2**20, 2 ** 42, 16801, 126581, scaling=False)
+        seed = nums[-1]
+        nums = [x / 2 ** 42 for x in nums]
+        _, pv = test(nums, *args, **kwargs)
+        pv_freq[int(pv * 10)] += 1
+    print("Rozkład p-wartości:", pv_freq)
+    return chisquare(pv_freq)
+
+
+def scd_level_glcg(test, R, *args, **kwargs):
+    pv_freq = [0] * 10
+    seed = [1342, 648, 137, 19, 925]
+    a_vec = [113, 4381, 7849, 229, 61]
+    for _ in range(R):
+        nums = glcg(seed, 2**20, 2 ** 42, a_vec, scaling=False)
+        seed = nums[-5:]
+        nums = [x / 2 ** 42 for x in nums]
+        _, pv = test(nums, *args, **kwargs)
+        pv_freq[int(pv * 10)] += 1
+    print("Rozkład p-wartości:", pv_freq)
+    return chisquare(pv_freq)
+
+
+def scd_level_bbs(test, R, *args, **kwargs):
+    pv_freq = [0] * 10
+    seed = 6834782
+    p, q = 125223563, 65581727
+    m = p*q
+    for _ in range(R):
+        nums = bbs(125223563, 65581727, seed, 2**20, scaling=False)
+        seed = nums[-1]
+        nums = [x / m for x in nums]
+        _, pv = test(nums, *args, **kwargs)
+        pv_freq[int(pv * 10)] += 1
+    print("Rozkład p-wartości:", pv_freq)
+    return chisquare(pv_freq)
+
+
+def scd_level_rc4(test, R, *args, **kwargs):
+    pv_freq = [0] * 10
+    L = 40
+    m = 32
+    K = [28, 7, 0, 5, 2, 5, 6, 22, 15, 1, 1, 1, 22,
+         30, 29, 9, 5, 11, 7, 0, 31, 15, 4, 29, 4,
+         5, 2, 17, 4, 19, 30, 22, 17, 15, 12, 29, 1, 4, 0, 21]
+    nums, i, j, S = rc4(K, L, 2**20, m, get_S=True)
+    _, pv = test(nums, *args, **kwargs)
+    pv_freq[int(pv * 10)] += 1
+
+    for _ in range(R-1):
+        nums, i, j, S = rc4(K, L, 2**20, m, i_arg=i, j_arg=j, S_arg=S, scdlevel=True)
+        _, pv = test(nums, *args, **kwargs)
+        pv_freq[int(pv * 10)] += 1
+    print("Rozkład p-wartości:", pv_freq)
     return chisquare(pv_freq)
 
 
@@ -124,8 +187,5 @@ if __name__ == "__main__":
     # seed(10)
     L = 13
     K = [randint(0, 31) for _ in range(L)]
-    print("bbs final p_value:", scd_level(test_chi2, 1000, bbs(125223563, 25223743, 6834782, 10**7), 100)[1])
-    print("lcg final p_value:", scd_level(test_chi2, 1024, lcg(1652, 2 ** 24, 2 ** 40, 16801, 126581), 100)[1])
-    print("rc4_32 final p_value:", scd_level(test_chi2_rc4, 1000, rc4_32(K, L, 10**7), 5, 32)[1])
     # for _ in range(10):
         # print(test_chi2(np.random.uniform, 10, size=1000))
