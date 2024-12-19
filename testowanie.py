@@ -1,7 +1,8 @@
 from testy import *
-from scipy.stats import kstest
+from scipy.stats import chisquare, norm, kstest
 from random import randint, seed
 from time import time
+from read import digits_pi, digits_e, digits_sqrt2
 
 seed(1234)
 start = time()
