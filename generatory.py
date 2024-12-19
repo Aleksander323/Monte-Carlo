@@ -2,12 +2,15 @@ from random import randint
 from collections import deque
 
 
-def lcg(x, ln, m, a, c):
-    nums = [(x := (a*x + c) % m) / m for _ in range(ln)]
+def lcg(x, ln, m, a, c, scaling=True):
+     if scaling:
+        nums = [(x := (a*x + c) % m) / m for _ in range(ln)]
+    else:
+        nums = [x := (a * x + c) % m for _ in range(ln)]
     return nums
 
 
-def glcg(x_vec, ln, m, a_vec):
+def glcg(x_vec, ln, m, a_vec, scaling=True):
     assert isinstance(x_vec, list)
     assert isinstance(a_vec, list)
     assert len(x_vec) == len(a_vec)
@@ -19,44 +22,61 @@ def glcg(x_vec, ln, m, a_vec):
         x = sum(a * x for a, x in zip(a_vec, reversed(x_vec))) % m
         x_vec.popleft()
         x_vec.append(x)
-        nums[t] = x / m
+        if scaling:
+            nums[t] = x/m
+        else:
+            nums[t] = x
         
     return nums
 
 
-def rc4_32(K, L, r, m):
+def rc4_32(K, L, r, m=32, i_arg=0, j_arg=0, S_arg=None, get_S=False, scdlevel=False):
     assert m >= L > 0 and type(L) == int
     assert len(K) == L
     assert r > 0 and type(r) == int
     
     # KSA
-    S = list(range(m))
-    j = 0
-    for i in range(m):
-        j = (j + S[i] + K[i % L]) % m
-        S[i], S[j] = S[j], S[i]
-        
+    if not scdlevel:
+        S = list(range(m))
+        j = 0
+        for i in range(m):
+            j = (j + S[i] + K[i % L]) % m
+            S[i], S[j] = S[j], S[i]
+
     # PRGA
-    i, j = 0, 0
-    Y = [0]*r
-    
-    for _ in range(r):
-        i = (i + 1) % m
-        j = (j + S[i]) % m
-        S[i], S[j] = S[j], S[i]
-        Y[r] = S[(S[i] + S[j]) % m]
-        
-    return Y
+        i, j = i_arg, j_arg
+        Y = [0]*r
+        for t in range(r):
+            i = (i + 1) % m
+            j = (j + S[i]) % m
+            S[i], S[j] = S[j], S[i]
+            Y[t] = S[(S[i] + S[j]) % m]
+        if not get_S:
+            return Y
+        else:
+            return Y, i, j, S
+    else:
+        S = S_arg
+        i, j = i_arg, j_arg
+        Y = [0] * r
+        for t in range(r):
+            i = (i + 1) % m
+            j = (j + S[i]) % m
+            S[i], S[j] = S[j], S[i]
+            Y[t] = S[(S[i] + S[j]) % m]
+        return Y, i, j, S
 
 
 # Blum Blum Shub
-def bbs(p, q, x, ln):
+def bbs(p, q, x, ln, scaling=True):
     # assert is_prime(p) and is_prime(q)
     assert x % p != 0 and x % q != 0 and p % 4 == 3 and q % 4 == 3
     
     m = p*q
-    nums = [(x := x*x % m) / m for _ in range(ln)]
-    
+    if scaling:
+        nums = [(x := x*x % m) / m for _ in range(ln)]
+    else:
+        nums = [x := x * x % m for _ in range(ln)]
     return nums
 
 
